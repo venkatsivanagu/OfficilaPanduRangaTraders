@@ -1,4 +1,13 @@
 {
+   "scripts": {
+    "dev": "vite",
+    "build": "node build.js",
+    "build:vite": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "clean": "rimraf dist",
+    "clean:build": "npm run clean && npm run build"
+  },
   "dependencies": {
     "react-datepicker": "^8.4.0"
   }
