@@ -1,5 +1,16 @@
 {
-  "dependencies": {
-    "react-datepicker": "^8.4.0"
+  "name": "panduranga-traders",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "office_bills"
+  ],
+  "scripts": {
+    "start": "cd office_bills && npm start",
+    "build": "cd office_bills && npm run build",
+    "test": "cd office_bills && npm test"
+  },
+  "engines": {
+    "node": ">=16.0.0"
   }
 }
