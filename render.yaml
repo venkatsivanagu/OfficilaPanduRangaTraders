@@ -22,10 +22,12 @@ services:
     env: node
     plan: free  # Free tier
     buildCommand: npm install
-    startCommand: npm start
+    startCommand: node server.js
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000
+      - key: NODE_VERSION
+        value: 18.x
     numInstances: 1
