@@ -5,24 +5,6 @@ databases:
     plan: free
 
 services:
-  # Frontend Service (Static Site)
-  - type: web
-    name: panduranga-traders-frontend
-    env: static
-    buildCommand: |
-      npm install
-      cd office_bills && npm install
-      npm run build
-    staticPublishPath: "./office_bills/dist"
-    envVars:
-      - key: NODE_VERSION
-        value: 18.x
-    routes:
-      - type: rewrite
-        source: "/*"
-        destination: "/index.html"
-  
-  # Backend Service (Node.js)
   - type: web
     name: panduranga-traders-backend
     env: node
