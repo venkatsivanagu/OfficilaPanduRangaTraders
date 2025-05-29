@@ -5,10 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "react-scripts build",
-    "build:vite": "vite build",
-    "lint": "eslint .",
+    "build": "vite build",
     "preview": "vite preview",
+    "lint": "eslint .",
     "clean": "rimraf dist",
     "clean:build": "npm run clean && npm run build"
   },

@@ -6,8 +6,10 @@
     "office_bills"
   ],
   "scripts": {
-    "start": "cd office_bills && npm start",
+    "install:all": "npm install && cd office_bills && npm install",
+    "start": "cd office_bills && npm run dev",
     "build": "cd office_bills && npm run build",
+    "preview": "cd office_bills && npm run preview",
     "test": "cd office_bills && npm test"
   },
   "engines": {
