@@ -1,6 +1,6 @@
 services:
   # Frontend Service (Static Site)
-  - type: web
+  - type: static_site
     name: panduranga-traders-frontend
     env: static
     buildCommand: |
@@ -15,7 +15,6 @@ services:
       - type: rewrite
         source: "/*"
         destination: "/index.html"
-    skipCleanup: true
   
   # Backend Service (Node.js) - Free Tier
   - type: web
