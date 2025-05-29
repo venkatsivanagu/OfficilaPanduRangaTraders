@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build --emptyOutDir",
     "preview": "vite preview",
+    "start": "vite preview --host --port $PORT",
     "lint": "eslint .",
     "clean": "rimraf dist",
     "clean:build": "npm run clean && npm run build"
