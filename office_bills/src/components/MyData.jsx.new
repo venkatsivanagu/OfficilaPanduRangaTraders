@@ -1,0 +1,165 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const MyData = () => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  
+  // Test data
+  const [entries, setEntries] = useState([
+    { _id: 1, vehicleNo: 'KA01AB1234', totalAmount: '1000', expenditure: '500', profit: '500', date: new Date() },
+    { _id: 2, vehicleNo: 'KA02CD5678', totalAmount: '1500', expenditure: '700', profit: '800', date: new Date() }
+  ]);
+
+  // Set loading to false after component mounts
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        backgroundColor: '#f3f4f6'
+      }}>
+        <div>Loading...</div>
+      </div>
+    );
+  }
+
+
+  // Calculate totals
+  const calculateTotal = (field) => {
+    return entries.reduce((sum, entry) => {
+      return sum + (parseFloat(entry[field]) || 0);
+    }, 0).toFixed(2);
+  };
+
+  const totalAmount = calculateTotal('totalAmount');
+  const totalExpenditure = calculateTotal('expenditure');
+  const remainingBalance = (parseFloat(totalAmount) - parseFloat(totalExpenditure)).toFixed(2);
+
+  return (
+    <div style={{
+      maxWidth: '1200px',
+      margin: '0 auto',
+      padding: '20px',
+      backgroundColor: '#f9fafb',
+      minHeight: '100vh'
+    }}>
+      {/* Header */}
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        marginBottom: '20px', 
+        padding: '10px 0', 
+        borderBottom: '1px solid #e5e7eb' 
+      }}>
+        <button 
+          onClick={() => navigate(-1)}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            marginRight: '15px',
+            fontSize: '20px',
+            padding: '5px 10px'
+          }}
+        >
+          ←
+        </button>
+        <h1 style={{ margin: 0, fontSize: '24px', fontWeight: '600' }}>My Data</h1>
+      </div>
+
+      {/* Summary Cards */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+        gap: '20px',
+        marginBottom: '20px'
+      }}>
+        {/* Total Balance Card */}
+        <div style={{
+          backgroundColor: '#fff',
+          borderRadius: '8px',
+          padding: '20px',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          borderLeft: '4px solid #3b82f6'
+        }}>
+          <h4 style={{ margin: '0 0 10px 0', color: '#6b7280', fontSize: '16px' }}>Total Balance</h4>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: '24px', fontWeight: '600' }}>₹{totalAmount}</span>
+          </div>
+        </div>
+
+        {/* Total Expenditure Card */}
+        <div style={{
+          backgroundColor: '#fff',
+          borderRadius: '8px',
+          padding: '20px',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          borderLeft: '4px solid #ef4444'
+        }}>
+          <h4 style={{ margin: '0 0 10px 0', color: '#6b7280', fontSize: '16px' }}>Total Expenditure</h4>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: '24px', fontWeight: '600' }}>₹{totalExpenditure}</span>
+          </div>
+        </div>
+
+        {/* Remaining Balance Card */}
+        <div style={{
+          backgroundColor: '#fff',
+          borderRadius: '8px',
+          padding: '20px',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          borderLeft: '4px solid #10b981'
+        }}>
+          <h4 style={{ margin: '0 0 10px 0', color: '#6b7280', fontSize: '16px' }}>Remaining Balance</h4>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: '24px', fontWeight: '600' }}>₹{remainingBalance}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Entries Table */}
+      <div style={{
+        backgroundColor: '#fff',
+        borderRadius: '8px',
+        padding: '20px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+      }}>
+        <h2 style={{ marginTop: 0, marginBottom: '20px' }}>Entries</h2>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+                <th style={{ textAlign: 'left', padding: '12px', fontWeight: 600 }}>Date</th>
+                <th style={{ textAlign: 'left', padding: '12px', fontWeight: 600 }}>Vehicle No</th>
+                <th style={{ textAlign: 'right', padding: '12px', fontWeight: 600 }}>Total Amount</th>
+                <th style={{ textAlign: 'right', padding: '12px', fontWeight: 600 }}>Expenditure</th>
+                <th style={{ textAlign: 'right', padding: '12px', fontWeight: 600 }}>Profit</th>
+              </tr>
+            </thead>
+            <tbody>
+              {entries.map((entry) => (
+                <tr key={entry._id} style={{ borderBottom: '1px solid #e5e7eb' }}>
+                  <td style={{ padding: '12px' }}>{new Date(entry.date).toLocaleDateString()}</td>
+                  <td style={{ padding: '12px' }}>{entry.vehicleNo}</td>
+                  <td style={{ padding: '12px', textAlign: 'right' }}>₹{parseFloat(entry.totalAmount).toFixed(2)}</td>
+                  <td style={{ padding: '12px', textAlign: 'right' }}>₹{parseFloat(entry.expenditure).toFixed(2)}</td>
+                  <td style={{ padding: '12px', textAlign: 'right' }}>₹{parseFloat(entry.profit).toFixed(2)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default MyData;

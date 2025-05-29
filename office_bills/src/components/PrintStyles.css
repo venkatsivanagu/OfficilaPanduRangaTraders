@@ -1,0 +1,188 @@
+@media print {
+  html, body {
+    height: 100%;
+  }
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  .bill-container, .bill-container * {
+    visibility: visible;
+  }
+
+  .bill-container {
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+    justify-content: flex-start !important;
+    margin-top: 0 !important;
+    padding-top: 0.5rem !important;
+    margin: 2rem auto 0 auto !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    box-shadow: 0 4px 24px rgba(44, 62, 80, 0.10) !important;
+    border: 2px solid #a0b4d6 !important;
+    background: #fff !important;
+    max-width: 1000px !important;
+    border-radius: 12px !important;
+  }
+
+  .print-button {
+    display: none !important;
+  }
+
+  .print-hidden {
+    display: none !important;
+  }
+
+  .bill-header-row,
+  .bill-info-row,
+  .bill-recipient-row,
+  .bill-table-section,
+  .bill-signature-row {
+    margin-bottom: 0.3rem !important;
+    margin-top: 0.3rem !important;
+  }
+  .bill-table th, .bill-table td {
+    padding: 0.2rem 0.3rem !important;
+    font-size: 0.95rem !important;
+    height: 1.5rem !important;
+  }
+  .bill-table-section {
+    margin-top: 0.5rem !important;
+    flex: 0 0 auto !important;
+    min-height: 20rem !important;
+  }
+  .bill-signature-row {
+    margin-top: 2rem !important;
+    page-break-inside: avoid !important;
+    page-break-before: avoid !important;
+    break-inside: avoid !important;
+    break-before: avoid !important;
+  }
+  .bill-signature-left, .bill-signature-right {
+    gap: 0.3rem !important;
+  }
+  .bill-divider {
+    margin: 0.3rem 0 !important;
+  }
+
+  /* Section 2: Info row - force side-by-side, no wrapping */
+  .bill-info-row {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    width: 100% !important;
+    gap: 2rem !important;
+    align-items: center !important;
+  }
+  .bill-info-left, .bill-info-right {
+    min-width: 0 !important;
+    flex: 1 1 0 !important;
+    width: auto !important;
+  }
+  .bill-info-right {
+    justify-content: center !important;
+    align-items: flex-start !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.2rem !important;
+  }
+
+  /* Section 5: Recipient details - robust fix for side-by-side */
+  .bill-recipient-details {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    width: 100% !important;
+    gap: 1.5rem !important;
+  }
+  .bill-recipient-details > div {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+  .bill-recipient-details input {
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .bill-info-left,
+  .bill-info-right,
+  .bill-recipient-details > div {
+    white-space: nowrap !important;
+  }
+
+  /* Signature section: keep both sides side by side */
+  .bill-signature-row {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    justify-content: space-between !important;
+    align-items: flex-end !important;
+    width: 100% !important;
+  }
+  .bill-signature-left,
+  .bill-signature-right {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    width: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.7rem !important;
+  }
+  .bill-signature-right {
+    align-items: flex-end !important;
+  }
+
+  /* 2. Remove input underlines inside the table */
+  .bill-table .bill-input-table,
+  .bill-table .bill-input-underline,
+  .bill-table textarea.bill-input-table {
+    border: none !important;
+    border-bottom: none !important;
+    background: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    padding: 0 !important;
+  }
+
+  /* Optional: Make table inputs look like plain text */
+  .bill-table .bill-input-table,
+  .bill-table .bill-input-underline,
+  .bill-table textarea.bill-input-table {
+    color: #22304a !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  /* Ensure inputs and textareas show their values */
+  .bill-input-underline,
+  .bill-input-table {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    border: none !important;
+    border-bottom: 2px solid #a0b4d6 !important;
+  }
+
+  /* Ensure table borders are visible */
+  .bill-table th,
+  .bill-table-label {
+    background: #f5f8fa !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+} 
