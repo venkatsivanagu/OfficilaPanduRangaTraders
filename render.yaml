@@ -1,0 +1,35 @@
+databases:
+  - name: panduranga-traders-db
+    databaseName: panduranga_traders
+    user: panduranga_user
+    plan: free
+
+services:
+  - type: web
+    name: panduranga-traders-frontend
+    env: static
+    buildCommand: cd office_bills && npm install && npm run build
+    staticPublishPath: "./office_bills/dist"
+    envVars:
+      - key: NODE_VERSION
+        value: 18.x
+    routes:
+      - type: rewrite
+        source: "/*"
+        destination: "/index.html"
+
+  - type: web
+    name: panduranga-traders-backend
+    env: node
+    buildCommand: cd backend && npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        fromDatabase:
+          name: panduranga-traders-db
+          property: connectionString
+      - key: PORT
+        value: 10000
+    numInstances: 1
