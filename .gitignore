@@ -10,10 +10,6 @@ yarn.lock
 .env.test.local
 .env.production.local
 
-# Build files
-/build
-/dist
-
 # Logs
 logs
 *.log
