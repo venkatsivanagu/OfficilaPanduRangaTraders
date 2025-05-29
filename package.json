@@ -12,5 +12,8 @@
   },
   "engines": {
     "node": ">=16.0.0"
+  },
+  "dependencies": {
+    "react-datepicker": "^8.4.0"
   }
 }
