@@ -28,6 +28,7 @@ app.use(cors({
             const msg = `CORS not allowed for ${origin}`;
             console.warn(msg);
             return callback(new Error(msg), false);
+
         }
         return callback(null, true);
     },

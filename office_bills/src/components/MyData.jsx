@@ -679,7 +679,11 @@ const MyData = () => {
                       {(entry.loss || 0) > 0 ? parseFloat(entry.loss).toFixed(2) : '-'}
                     </td>
                     <td style={{ padding: '12px' }}>{entry.recipientName || '-'}</td>
-                    <td style={{ padding: '12px', whiteSpace: 'nowrap' }}>
+                    <td style={{ 
+                      padding: '12px', 
+                      whiteSpace: 'nowrap',
+                      color: '#000000' // Ensure text is always black
+                    }}>
                       {entry.billDate ? new Date(entry.billDate).toLocaleDateString('en-GB') : '-'}
                     </td>
                     <td style={{ padding: '8px', textAlign: 'center' }}>
