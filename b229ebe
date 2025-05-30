@@ -1,0 +1,26 @@
+[33mb229ebe[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m hoping for the best
+[33m33d8680[m change to render
+[33m8c5720d[m final commit
+[33m50ffc96[m Update CORS configuration
+[33me2e68a8[m clear change
+[33mcb27ae9[m Change frontend service type to static_site in render.yaml
+[33m1d049bc[m Fix static site deployment configuration in render.yaml
+[33me663387[m backend changes2
+[33m83b265c[m backend changes
+[33m312c106[m Add backend deployment configuration and update server.js for production
+[33m3c880cc[m Fix build configuration for Vite and update deployment settings
+[33m63b97ac[m Resolve merge conflict in package.json
+[33m81f2088[m Update package.json and render.yaml for Render deployment
+[33m8c1bcde[m Add Render configuration files
+[33m9810074[m Update package.json
+[33mb678bea[m Update package.json
+[33m401f586[m Update package.json
+[33mbbb730f[m Add dist directory to version control
+[33mea02fbf[m Update .gitignore to track dist directory
+[33m22095d6[m final change
+[33m48fe7de[m Rename frontend directory to office_bills to match repository structure
+[33m5de6ffc[m change6
+[33m78763f2[m change5
+[33maaba6e8[m change4
+[33m2341765[m change2
+[33m29152c9[m Initial commit: Full-stack office bills management system
