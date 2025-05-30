@@ -16,7 +16,8 @@ const allowedOrigins = [
     'http://localhost:5173',
     'https://pandurangatradersoffical.vercel.app',
     'https://panduranga-traders-frontend.vercel.app',
-    'https://panduranga-traders-backend.onrender.com'
+    'https://panduranga-traders-backend.onrender.com',
+    'https://panduranga-traders-frontend.onrender.com'
 ];
 
 // Middleware
