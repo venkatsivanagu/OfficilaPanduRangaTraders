@@ -25,11 +25,46 @@ router.get('/', async (req, res) => {
 // Create a new entry
 router.post('/', async (req, res) => {
   try {
-    const entry = new Entry(req.body);
+    console.log('Received request body:', req.body);
+    
+    // Validate required fields
+    const requiredFields = ['vehicleNo', 'totalAmount', 'phonepeAmount', 'cashAmount', 'expenditure', 'recipientName', 'billDate'];
+    const missingFields = requiredFields.filter(field => !req.body[field]);
+    
+    if (missingFields.length > 0) {
+      console.error('Missing required fields:', missingFields);
+      return res.status(400).json({ 
+        message: `Missing required fields: ${missingFields.join(', ')}`,
+        receivedData: req.body
+      });
+    }
+    
+    // Create new entry with validated data
+    const entry = new Entry({
+      vehicleNo: req.body.vehicleNo,
+      totalAmount: parseFloat(req.body.totalAmount) || 0,
+      phonepeAmount: parseFloat(req.body.phonepeAmount) || 0,
+      cashAmount: parseFloat(req.body.cashAmount) || 0,
+      expenditure: parseFloat(req.body.expenditure) || 0,
+      profit: parseFloat(req.body.profit) || 0,
+      loss: parseFloat(req.body.loss) || 0,
+      recipientName: req.body.recipientName,
+      billDate: new Date(req.body.billDate)
+    });
+    
+    console.log('Attempting to save entry:', entry);
     const newEntry = await entry.save();
+    console.log('Entry saved successfully:', newEntry);
+    
     res.status(201).json(newEntry);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    console.error('Error saving entry:', err);
+    res.status(400).json({ 
+      message: 'Failed to save entry',
+      error: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+      receivedData: req.body
+    });
   }
 });
 
