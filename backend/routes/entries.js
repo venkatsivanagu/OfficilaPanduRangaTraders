@@ -25,17 +25,27 @@ router.get('/', async (req, res) => {
 // Create a new entry
 router.post('/', async (req, res) => {
   try {
+    // Check if request body exists
+    if (!req.body) {
+      console.error('No request body received');
+      return res.status(400).json({ 
+        message: 'Request body is required',
+        error: 'No request body received'
+      });
+    }
+
     console.log('Received request body:', req.body);
     
     // Validate required fields
     const requiredFields = ['vehicleNo', 'totalAmount', 'phonepeAmount', 'cashAmount', 'expenditure', 'recipientName', 'billDate'];
-    const missingFields = requiredFields.filter(field => !req.body[field]);
+    const missingFields = requiredFields.filter(field => req.body[field] === undefined || req.body[field] === null || req.body[field] === '');
     
     if (missingFields.length > 0) {
       console.error('Missing required fields:', missingFields);
       return res.status(400).json({ 
         message: `Missing required fields: ${missingFields.join(', ')}`,
-        receivedData: req.body
+        receivedData: req.body,
+        error: 'Validation error'
       });
     }
     
