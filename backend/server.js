@@ -10,31 +10,33 @@ dotenv.config();
 const app = express();
 
 // CORS Configuration
+// CORS Configuration
 const allowedOrigins = [
     'http://localhost:3000',
-    'http://localhost:5173',  // Common Vite dev server port
+    'http://localhost:5173',
     'https://pandurangatradersoffical.vercel.app',
-    'https://panduranga-traders-frontend.onrender.com'
+    'https://panduranga-traders-frontend.onrender.com',
+    'https://panduranga-traders-backend.onrender.com'
 ];
 
 // Middleware
 app.use(cors({
     origin: function(origin, callback) {
-        console.log('Request origin:', origin);  // Log the origin for debugging
         // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
-        if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-            return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+            const msg = `CORS not allowed for ${origin}`;
+            console.warn(msg);
+            return callback(new Error(msg), false);
         }
-        console.warn('Blocked by CORS:', origin);
-        return callback(new Error('Not allowed by CORS'), false);
+        return callback(null, true);
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
+    maxAge: 86400 // 24 hours
 }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 // MongoDB Connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/bills_db';
