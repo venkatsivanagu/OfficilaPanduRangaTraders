@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../config';
 import BillView from './BillView';
 import BackNav from './BackNav';
 import ConfirmationDialog from './ConfirmationDialog';
@@ -20,18 +21,27 @@ const SavedBills = () => {
   useEffect(() => {
     const fetchBills = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/bills');
+        console.log('Fetching bills from:', `${API_BASE_URL}/bills`);
+        const response = await fetch(`${API_BASE_URL}/bills`);
+        
+        console.log('Response status:', response.status);
+        
         if (!response.ok) {
-          throw new Error('Failed to fetch bills');
+          const errorData = await response.json().catch(() => ({}));
+          console.error('Error response:', errorData);
+          throw new Error(`Failed to fetch bills: ${response.status} ${response.statusText}`);
         }
+        
         const data = await response.json();
+        console.log('Fetched bills:', data);
         setBills(data);
+        setError(null);
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching bills:', error);
-        setError('Failed to load bills. Please try again later.');
+        console.error('Error in fetchBills:', error);
+        setError(`Failed to load bills: ${error.message}. Please check your connection and try again.`);
         setLoading(false);
-    }
+      }
     };
 
     fetchBills();
@@ -50,7 +60,7 @@ const SavedBills = () => {
     
     try {
       setIsDeleting(true);
-      const response = await fetch(`http://localhost:5000/api/bills/${billToDelete}`, {
+      const response = await fetch(`${API_BASE_URL}/bills/${billToDelete}`, {
         method: 'DELETE',
       });
 

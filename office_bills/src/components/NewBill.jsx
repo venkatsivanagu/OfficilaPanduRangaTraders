@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { API_BASE_URL } from '../config';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import './NewBillStyles.css';
@@ -87,7 +88,7 @@ const NewBill = () => {
     };
 
     try {
-      const response = await fetch('http://localhost:5000/api/bills', {
+      const response = await fetch(`${API_BASE_URL}/bills`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

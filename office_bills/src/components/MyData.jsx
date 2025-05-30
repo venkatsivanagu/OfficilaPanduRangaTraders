@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 import { useNavigate } from 'react-router-dom';
 import BackNav from './BackNav';
 import DatePicker from 'react-datepicker';
@@ -23,7 +24,7 @@ const MyData = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  const API_URL = 'http://localhost:5000/api/entries';
+  const API_URL = `${API_BASE_URL}/entries`;
   const [formData, setFormData] = useState(initialFormData);
   const [editingId, setEditingId] = useState(null);
   const [startDate, setStartDate] = useState(null);

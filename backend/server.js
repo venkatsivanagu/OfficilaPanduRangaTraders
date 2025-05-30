@@ -12,22 +12,26 @@ const app = express();
 // CORS Configuration
 const allowedOrigins = [
     'http://localhost:3000',
+    'http://localhost:5173',  // Common Vite dev server port
     'https://pandurangatradersoffical.vercel.app',
-    'https://panduranga-traders-frontend.onrender.com' // Render frontend URL
+    'https://panduranga-traders-frontend.onrender.com'
 ];
 
 // Middleware
 app.use(cors({
-    origin: function (origin, callback) {
+    origin: function(origin, callback) {
+        console.log('Request origin:', origin);  // Log the origin for debugging
         // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
-        if (allowedOrigins.indexOf(origin) === -1) {
-            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-            return callback(new Error(msg), false);
+        if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+            return callback(null, true);
         }
-        return callback(null, true);
+        console.warn('Blocked by CORS:', origin);
+        return callback(new Error('Not allowed by CORS'), false);
     },
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -37,18 +41,29 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/bills_
 const mongooseOptions = {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 5000,
-    socketTimeoutMS: 45000
+    serverSelectionTimeoutMS: 30000, // Increased timeout for production
+    socketTimeoutMS: 45000,
+    retryWrites: true,
+    w: 'majority'
 };
 
+// Production/Development environment check
+const isProduction = process.env.NODE_ENV === 'production';
+
 // Handle MongoDB connection
-const connectDB = async () => {
+const connectDB = async() => {
     try {
+        if (!MONGODB_URI) {
+            throw new Error('MongoDB connection string is not defined. Please set MONGODB_URI environment variable.');
+        }
         await mongoose.connect(MONGODB_URI, mongooseOptions);
         console.log('MongoDB connected successfully');
     } catch (error) {
-        console.error('MongoDB connection error:', error);
-        // Retry connection after 5 seconds
+        console.error('MongoDB connection error:', error.message);
+        if (isProduction) {
+            console.log('Retrying connection in 5 seconds...');
+            setTimeout(connectDB, 5000);
+        }
         setTimeout(connectDB, 5000);
     }
 };
