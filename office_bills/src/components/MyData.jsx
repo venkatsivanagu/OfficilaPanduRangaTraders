@@ -90,21 +90,53 @@ const MyData = () => {
     }
     
     try {
+      // Prepare the entry data with proper types
       const entryData = {
-        ...formData,
-        billDate: formData.billDate.toISOString()
+        vehicleNo: String(formData.vehicleNo || ''),
+        totalAmount: parseFloat(formData.totalAmount) || 0,
+        phonepeAmount: parseFloat(formData.phonepeAmount) || 0,
+        cashAmount: parseFloat(formData.cashAmount) || 0,
+        expenditure: parseFloat(formData.expenditure) || 0,
+        profit: parseFloat(formData.profit) || 0,
+        loss: parseFloat(formData.loss) || 0,
+        recipientName: String(formData.recipientName || ''),
+        billDate: formData.billDate ? new Date(formData.billDate).toISOString() : new Date().toISOString()
       };
+
+      console.log('Sending request to:', API_URL);
+      console.log('Request data:', JSON.stringify(entryData, null, 2));
       
+      let response;
       if (editingId !== null) {
         // Update existing entry
-        const response = await axios.put(`${API_URL}/${editingId}`, entryData);
+        console.log(`Updating entry with ID: ${editingId}`);
+        response = await axios({
+          method: 'put',
+          url: `${API_URL}/${editingId}`,
+          data: entryData,
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        });
+        console.log('Update response:', response);
         setEntries(entries.map(entry => 
           entry._id === editingId ? { ...response.data, billDate: new Date(response.data.billDate) } : entry
         ));
         setPopupMessage('Entry updated successfully!');
       } else {
         // Add new entry
-        const response = await axios.post(API_URL, entryData);
+        console.log('Creating new entry');
+        response = await axios({
+          method: 'post',
+          url: API_URL,
+          data: entryData,
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        });
+        console.log('Create response:', response);
         setEntries([{ ...response.data, billDate: new Date(response.data.billDate) }, ...entries]);
         setPopupMessage('Entry added successfully!');
       }
@@ -115,7 +147,25 @@ const MyData = () => {
       setShowPopup(true);
     } catch (err) {
       console.error('Error saving entry:', err);
-      setPopupMessage('Failed to save entry. Please try again.');
+      console.error('Error details:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+        headers: err.response?.headers,
+        config: {
+          url: err.config?.url,
+          method: err.config?.method,
+          data: err.config?.data,
+          headers: err.config?.headers
+        }
+      });
+      
+      const errorMessage = err.response?.data?.message || 
+                         err.response?.data?.error || 
+                         err.message || 
+                         'Failed to save entry. Please try again.';
+      
+      setPopupMessage(`Error: ${errorMessage}`);
       setPopupType('error');
       setShowPopup(true);
     }
@@ -135,23 +185,45 @@ const MyData = () => {
     if (!entryToDelete) return;
     
     try {
-      const response = await axios.delete(`${API_URL}/${entryToDelete}`);
+      console.log(`Attempting to delete entry with ID: ${entryToDelete}`);
+      const response = await axios({
+        method: 'delete',
+        url: `${API_URL}/${entryToDelete}`,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
       
-      if (response.status === 200) {
-        setEntries(entries.filter(entry => entry._id !== entryToDelete));
+      console.log('Delete response:', response);
+      
+      if (response.status === 200 || response.status === 204) {
+        // Remove the deleted entry from the local state
+        setEntries(prevEntries => prevEntries.filter(entry => entry._id !== entryToDelete));
         setShowDeleteDialog(false);
+        setEntryToDelete(null);
         setPopupMessage('Entry deleted successfully!');
         setPopupType('success');
+        setShowPopup(true);
       } else {
-        throw new Error('Failed to delete entry');
+        throw new Error(`Unexpected status code: ${response.status}`);
       }
     } catch (err) {
       console.error('Error deleting entry:', err);
-      const errorMessage = err.response?.data?.message || 'Failed to delete entry. Please try again.';
-      setPopupMessage(errorMessage);
+      console.error('Error details:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      });
+      
+      const errorMessage = err.response?.data?.message || 
+                         err.message || 
+                         'Failed to delete entry. Please try again.';
+      
+      setPopupMessage(`Error: ${errorMessage}`);
       setPopupType('error');
-    } finally {
       setShowPopup(true);
+    } finally {
       setEntryToDelete(null);
     }
   };

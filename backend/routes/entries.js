@@ -25,55 +25,133 @@ router.get('/', async (req, res) => {
 // Create a new entry
 router.post('/', async (req, res) => {
   try {
+    console.log('=== NEW ENTRY REQUEST ===');
+    console.log('Request received at:', new Date().toISOString());
+    console.log('Request headers:', JSON.stringify(req.headers, null, 2));
+    console.log('Raw request body:', req.body);
+    
     // Check if request body exists
-    if (!req.body) {
-      console.error('No request body received');
+    if (!req.body || Object.keys(req.body).length === 0) {
+      const errorMsg = 'No request body received or empty body';
+      console.error(errorMsg);
       return res.status(400).json({ 
-        message: 'Request body is required',
-        error: 'No request body received'
-      });
-    }
-
-    console.log('Received request body:', req.body);
-    
-    // Validate required fields
-    const requiredFields = ['vehicleNo', 'totalAmount', 'phonepeAmount', 'cashAmount', 'expenditure', 'recipientName', 'billDate'];
-    const missingFields = requiredFields.filter(field => req.body[field] === undefined || req.body[field] === null || req.body[field] === '');
-    
-    if (missingFields.length > 0) {
-      console.error('Missing required fields:', missingFields);
-      return res.status(400).json({ 
-        message: `Missing required fields: ${missingFields.join(', ')}`,
-        receivedData: req.body,
-        error: 'Validation error'
+        success: false,
+        message: errorMsg,
+        error: 'INVALID_REQUEST_BODY',
+        timestamp: new Date().toISOString()
       });
     }
     
-    // Create new entry with validated data
-    const entry = new Entry({
-      vehicleNo: req.body.vehicleNo,
+    console.log('Received request body type:', typeof req.body);
+    console.log('Received request body keys:', Object.keys(req.body));
+    
+    // Normalize request body
+    const entryData = {
+      vehicleNo: String(req.body.vehicleNo || ''),
       totalAmount: parseFloat(req.body.totalAmount) || 0,
       phonepeAmount: parseFloat(req.body.phonepeAmount) || 0,
       cashAmount: parseFloat(req.body.cashAmount) || 0,
       expenditure: parseFloat(req.body.expenditure) || 0,
       profit: parseFloat(req.body.profit) || 0,
       loss: parseFloat(req.body.loss) || 0,
-      recipientName: req.body.recipientName,
-      billDate: new Date(req.body.billDate)
+      recipientName: String(req.body.recipientName || ''),
+      billDate: req.body.billDate ? new Date(req.body.billDate) : new Date(),
+      notes: String(req.body.notes || '')
+    };
+    
+    console.log('Normalized entry data:', JSON.stringify(entryData, null, 2));
+    
+    // Define required fields
+    const requiredFields = [
+      'vehicleNo', 
+      'totalAmount', 
+      'phonepeAmount', 
+      'cashAmount', 
+      'expenditure', 
+      'recipientName', 
+      'billDate'
+    ];
+    
+    // Check for missing fields
+    const missingFields = requiredFields.filter(field => {
+      const value = entryData[field];
+      return value === undefined || 
+             value === null || 
+             (typeof value === 'string' && value.trim() === '') ||
+             (typeof value === 'number' && isNaN(value));
     });
     
-    console.log('Attempting to save entry:', entry);
-    const newEntry = await entry.save();
-    console.log('Entry saved successfully:', newEntry);
+    if (missingFields.length > 0) {
+      const errorMsg = `Missing or invalid required fields: ${missingFields.join(', ')}`;
+      console.error(errorMsg);
+      return res.status(400).json({ 
+        success: false,
+        message: errorMsg,
+        missingFields: missingFields,
+        receivedData: req.body,
+        normalizedData: entryData,
+        error: 'VALIDATION_ERROR',
+        timestamp: new Date().toISOString()
+      });
+    }
     
-    res.status(201).json(newEntry);
+    // Create new entry with normalized data
+    console.log('Creating new entry with data:', JSON.stringify(entryData, null, 2));
+    
+    const entry = new Entry(entryData);
+    
+    try {
+      const newEntry = await entry.save();
+      console.log('Entry created successfully:', newEntry._id);
+      
+      res.status(201).json({
+        success: true,
+        message: 'Entry created successfully',
+        data: newEntry,
+        timestamp: new Date().toISOString()
+      });
+    } catch (saveError) {
+      console.error('Database save error:', saveError);
+      
+      // Handle duplicate key errors
+      if (saveError.code === 11000) {
+        return res.status(409).json({
+          success: false,
+          message: 'Entry with these details already exists',
+          error: 'DUPLICATE_ENTRY',
+          details: saveError.keyValue,
+          timestamp: new Date().toISOString()
+        });
+      }
+      
+      // Handle validation errors
+      if (saveError.name === 'ValidationError') {
+        const validationErrors = Object.values(saveError.errors).map(err => ({
+          field: err.path,
+          message: err.message,
+          type: err.kind
+        }));
+        
+        return res.status(400).json({
+          success: false,
+          message: 'Validation failed',
+          error: 'VALIDATION_ERROR',
+          validationErrors: validationErrors,
+          timestamp: new Date().toISOString()
+        });
+      }
+      
+      throw saveError; // Re-throw for the outer catch block
+    }
   } catch (err) {
-    console.error('Error saving entry:', err);
-    res.status(400).json({ 
-      message: 'Failed to save entry',
-      error: err.message,
-      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
-      receivedData: req.body
+    console.error('Unexpected error in POST /:', err);
+    
+    res.status(500).json({ 
+      success: false, 
+      message: 'An unexpected error occurred while creating the entry',
+      error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error',
+      timestamp: new Date().toISOString(),
+      ...(process.env.NODE_ENV === 'development' ? { stack: err.stack } : {})
     });
   }
 });

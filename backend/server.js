@@ -9,12 +9,7 @@ dotenv.config();
 
 const app = express();
 
-// Middleware to parse JSON bodies
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// CORS Configuration
-// CORS Configuration
+// 1. Enable CORS first
 const allowedOrigins = [
     'http://localhost:3000',
     'http://localhost:5173',
@@ -24,8 +19,8 @@ const allowedOrigins = [
     'https://panduranga-traders-frontend.onrender.com'
 ];
 
-// Middleware
-app.use(cors({
+// Configure CORS with specific options
+const corsOptions = {
     origin: function(origin, callback) {
         // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
@@ -33,7 +28,6 @@ app.use(cors({
             const msg = `CORS not allowed for ${origin}`;
             console.warn(msg);
             return callback(new Error(msg), false);
-
         }
         return callback(null, true);
     },
@@ -42,7 +36,29 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
     maxAge: 86400 // 24 hours
-}));
+};
+
+// 2. Apply CORS middleware
+app.use(cors(corsOptions));
+
+// 3. Body parsing middleware - must come before routes
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// 4. Log all incoming requests for debugging
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    console.log('Request Headers:', JSON.stringify(req.headers, null, 2));
+    if (req.method !== 'GET') {
+        console.log('Request Body:', JSON.stringify(req.body, null, 2));
+    }
+    next();
+});
+
+// 5. Simple health check endpoint
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'ok', timestamp: new Date() });
+});
 
 // MongoDB Connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/bills_db';
